@@ -196,10 +196,16 @@
             margin: 5px;
             font-size: 0.9em;
             transition: background 0.3s;
+            cursor: pointer;
+            border: none;
         }
 
         .download-btn:hover {
             background: #5568d3;
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
         }
 
         .error {
@@ -297,6 +303,29 @@
         const error = document.getElementById('error');
         const result = document.getElementById('result');
 
+        // Fungsi untuk download file langsung
+        async function downloadFile(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+            } catch (err) {
+                console.error('Download error:', err);
+                // Fallback: buka di tab baru
+                window.open(url, '_blank');
+            }
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -388,11 +417,11 @@
 
             html += '<div style="margin-top: 15px; text-align: center;">';
             slides.forEach((slideUrl, index) => {
-                html += `<a href="${slideUrl}" class="download-btn" download="slide-${index + 1}.jpg" target="_blank">📥 Slide ${index + 1}</a>`;
+                html += `<button class="download-btn" onclick="downloadFile('${slideUrl}', 'slide-${index + 1}.jpg')">📥 Slide ${index + 1}</button>`;
             });
             
             if (music && music.url) {
-                html += `<a href="${music.url}" class="download-btn" download="audio.mp3" target="_blank">🎵 Download Audio</a>`;
+                html += `<button class="download-btn" onclick="downloadFile('${music.url}', 'audio.mp3')">🎵 Download Audio</button>`;
             }
             html += '</div>';
 
@@ -460,13 +489,13 @@
 
             html += '<div style="margin-top: 15px; text-align: center;">';
             if (video_hd) {
-                html += `<a href="${video_hd}" class="download-btn" download="tiktok-hd.mp4" target="_blank">📥 Download HD</a>`;
+                html += `<button class="download-btn" onclick="downloadFile('${video_hd}', 'tiktok-hd.mp4')">📥 Download HD</button>`;
             }
             if (video_sd) {
-                html += `<a href="${video_sd}" class="download-btn" download="tiktok-sd.mp4" target="_blank">📥 Download SD</a>`;
+                html += `<button class="download-btn" onclick="downloadFile('${video_sd}', 'tiktok-sd.mp4')">📥 Download SD</button>`;
             }
             if (music && music.url) {
-                html += `<a href="${music.url}" class="download-btn" download="audio.mp3" target="_blank">🎵 Download Audio</a>`;
+                html += `<button class="download-btn" onclick="downloadFile('${music.url}', 'audio.mp3')">🎵 Download Audio</button>`;
             }
             html += '</div>';
 
