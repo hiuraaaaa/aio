@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader - Download Video & Slides</title>
+    <title>HD Video Enhancer - Lumina.aio</title>
     <style>
         * {
             margin: 0;
@@ -141,11 +141,113 @@
             font-weight: 500;
         }
 
-        .input-group {
+        .upload-area {
+            border: 2px dashed rgba(99, 102, 241, 0.3);
+            border-radius: 0;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(99, 102, 241, 0.02);
+        }
+
+        .upload-area:hover {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .upload-text h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .upload-text p {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .selected-file {
+            display: none;
+            background: #f9fafb;
+            padding: 15px 20px;
+            border-radius: 0;
             margin-bottom: 20px;
         }
 
-        .input-group label {
+        .selected-file.active {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 3px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .remove-btn {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .remove-btn:hover {
+            color: #dc2626;
+        }
+
+        .resolution-select {
+            margin-bottom: 20px;
+        }
+
+        .resolution-select label {
             display: block;
             margin-bottom: 10px;
             color: #1f2937;
@@ -153,25 +255,41 @@
             font-size: 14px;
         }
 
-        .input-group input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+        .resolution-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .resolution-option {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
             border-radius: 0;
-            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
             transition: all 0.3s;
             background: white;
-            color: #1f2937;
         }
 
-        .input-group input:focus {
-            outline: none;
+        .resolution-option:hover {
             border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
-        .input-group input::placeholder {
-            color: #9ca3af;
+        .resolution-option.active {
+            border-color: #6366f1;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .resolution-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .resolution-desc {
+            font-size: 11px;
+            margin-top: 2px;
+            opacity: 0.8;
         }
 
         .btn {
@@ -188,7 +306,7 @@
             box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
@@ -216,7 +334,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border-top: 4px solid #6366f1;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -227,6 +345,27 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .progress-info {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .error {
+            display: none;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 0;
+            margin-top: 15px;
+        }
+
+        .error.active {
+            display: block;
+            animation: slideUp 0.3s ease;
         }
 
         .result {
@@ -253,104 +392,54 @@
             gap: 8px;
         }
 
-        .info-item {
-            margin: 12px 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        .info-item strong {
-            color: #1f2937;
-            font-weight: 600;
-        }
-
-        .media-grid {
+        .comparison {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 15px 0;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        .media-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            aspect-ratio: 1;
+        .video-preview {
+            text-align: center;
         }
 
-        .media-item img {
+        .video-preview h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .video-preview video {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            border-radius: 0;
+            background: #000;
+        }
+
+        .download-section {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
         }
 
         .download-btn {
             display: inline-block;
-            padding: 10px 20px;
-            background: #667eea;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            margin: 5px;
-            font-size: 0.9em;
-            transition: background 0.3s;
+            border-radius: 0;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             border: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .download-btn:hover {
-            background: #5568d3;
-        }
-
-        .download-btn:active {
-            transform: scale(0.98);
-        }
-
-        .error {
-            display: none;
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .error.active {
-            display: block;
-            animation: slideUp 0.3s ease;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .stat-card {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 0;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .stat-card:hover {
-            background: #f3f4f6;
-        }
-
-        .stat-card .number {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 5px;
-        }
-
-        .stat-card .label {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 500;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
 
         /* Footer */
@@ -412,7 +501,11 @@
                 font-size: 22px;
             }
 
-            .stats {
+            .resolution-options {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison {
                 grid-template-columns: 1fr;
             }
 
@@ -438,41 +531,85 @@
     <div class="container">
         <!-- Logo Header -->
         <div class="logo-header">
-            <div class="logo-icon">🎵</div>
+            <div class="logo-icon">🎬</div>
             <div>
                 <div class="logo-text">Lumina.aio</div>
-                <div class="logo-subtitle">TikTok Downloader</div>
+                <div class="logo-subtitle">HD Video Enhancer</div>
             </div>
         </div>
 
         <!-- Main Card -->
         <div class="main-card">
             <div class="header">
-                <h1>🎵 TikTok Downloader</h1>
-                <p>Download video dan slides TikTok tanpa watermark</p>
+                <h1>🎬 HD Video Enhancer</h1>
+                <p>Enhance your videos to stunning HD quality using AI</p>
             </div>
 
-            <form id="downloadForm">
-                <div class="input-group">
-                    <label for="urlInput">URL TikTok</label>
-                    <input 
-                        type="text" 
-                        id="urlInput" 
-                        placeholder="https://vt.tiktok.com/ZSaan6TSe/" 
-                        required
-                    >
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">
+                    <h3>Click or drag video here</h3>
+                    <p>Supports MP4, MOV, AVI (Max 100MB)</p>
                 </div>
-                <button type="submit" class="btn" id="downloadBtn">Download</button>
-            </form>
+                <input type="file" id="fileInput" class="file-input" accept="video/*">
+            </div>
+
+            <!-- Selected File -->
+            <div class="selected-file" id="selectedFile">
+                <div class="file-icon">🎥</div>
+                <div class="file-info">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+                <div class="remove-btn" id="removeFile">✕</div>
+            </div>
+
+            <!-- Resolution Select -->
+            <div class="resolution-select">
+                <label>Select Output Quality</label>
+                <div class="resolution-options">
+                    <div class="resolution-option" data-resolution="720p">
+                        <div class="resolution-label">HD</div>
+                        <div class="resolution-desc">720p</div>
+                    </div>
+                    <div class="resolution-option active" data-resolution="2k">
+                        <div class="resolution-label">2K</div>
+                        <div class="resolution-desc">1440p</div>
+                    </div>
+                    <div class="resolution-option" data-resolution="4k">
+                        <div class="resolution-label">4K</div>
+                        <div class="resolution-desc">2160p</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="enhanceBtn" disabled>Enhance Video</button>
 
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Sedang mengunduh konten...</p>
+                <p>Enhancing video to HD...</p>
+                <p class="progress-info">This may take a few minutes, please wait...</p>
             </div>
 
             <div class="error" id="error"></div>
 
-            <div class="result" id="result"></div>
+            <div class="result" id="result">
+                <h3>✅ Video Enhanced Successfully!</h3>
+                <div class="comparison">
+                    <div class="video-preview">
+                        <h4>Original</h4>
+                        <video controls id="originalVideo"></video>
+                    </div>
+                    <div class="video-preview">
+                        <h4>Enhanced (HD)</h4>
+                        <video controls id="enhancedVideo"></video>
+                    </div>
+                </div>
+                <div class="download-section">
+                    <button class="download-btn" id="downloadBtn">📥 Download HD Video</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -488,14 +625,204 @@
     </div>
 
     <script>
-        const form = document.getElementById('downloadForm');
-        const urlInput = document.getElementById('urlInput');
-        const downloadBtn = document.getElementById('downloadBtn');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFile = document.getElementById('removeFile');
+        const enhanceBtn = document.getElementById('enhanceBtn');
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
         const result = document.getElementById('result');
+        const resolutionOptions = document.querySelectorAll('.resolution-option');
 
-        // Fungsi untuk download file langsung
+        let currentFile = null;
+        let selectedResolution = '2k';
+
+        // Upload area click
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // Remove file
+        removeFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentFile = null;
+            fileInput.value = '';
+            selectedFile.classList.remove('active');
+            enhanceBtn.disabled = true;
+            hideError();
+            hideResult();
+        });
+
+        // Resolution selection
+        resolutionOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                resolutionOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                selectedResolution = option.dataset.resolution;
+            });
+        });
+
+        // Enhance button
+        enhanceBtn.addEventListener('click', enhanceVideo);
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('video/')) {
+                showError('Please upload a video file');
+                return;
+            }
+
+            if (file.size > 100 * 1024 * 1024) {
+                showError('File size must be less than 100MB');
+                return;
+            }
+
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            selectedFile.classList.add('active');
+            enhanceBtn.disabled = false;
+            hideError();
+            hideResult();
+        }
+
+        async function enhanceVideo() {
+            if (!currentFile) return;
+
+            hideError();
+            hideResult();
+            showLoading();
+            enhanceBtn.disabled = true;
+
+            try {
+                const baseApi = 'https://api.unblurimage.ai';
+                const productSerial = generateUUID();
+
+                // Step 1: Get upload URL
+                const uploadForm = new FormData();
+                uploadForm.append('video_file_name', `cli-${Date.now()}.mp4`);
+
+                const uploadResp = await fetch(`${baseApi}/api/upscaler/v1/ai-video-enhancer/upload-video`, {
+                    method: 'POST',
+                    body: uploadForm
+                });
+
+                const uploadData = await uploadResp.json();
+                if (uploadData.code !== 100000) throw new Error('Upload failed');
+
+                const { url: uploadUrl, object_name } = uploadData.result;
+
+                // Step 2: Upload video
+                await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: { 'content-type': 'video/mp4' },
+                    body: currentFile
+                });
+
+                const cdnUrl = `https://cdn.unblurimage.ai/${object_name}`;
+
+                // Step 3: Create enhancement job
+                const jobForm = new FormData();
+                jobForm.append('original_video_file', cdnUrl);
+                jobForm.append('resolution', selectedResolution);
+                jobForm.append('is_preview', 'false');
+
+                const createJobResp = await fetch(`${baseApi}/api/upscaler/v2/ai-video-enhancer/create-job`, {
+                    method: 'POST',
+                    body: jobForm,
+                    headers: {
+                        'product-serial': productSerial,
+                        'authorization': ''
+                    }
+                });
+
+                const jobData = await createJobResp.json();
+                if (jobData.code !== 100000) throw new Error('Failed to create job');
+
+                const { job_id } = jobData.result;
+
+                // Step 4: Poll for result
+                const startTime = Date.now();
+                let attempt = 0;
+                let resultData;
+
+                while (true) {
+                    attempt++;
+
+                    const jobResp = await fetch(`${baseApi}/api/upscaler/v2/ai-video-enhancer/get-job/${job_id}`, {
+                        method: 'GET',
+                        headers: {
+                            'product-serial': productSerial,
+                            'authorization': ''
+                        }
+                    });
+
+                    const jobStatus = await jobResp.json();
+
+                    if (jobStatus.code === 100000 && jobStatus.result?.output_url) {
+                        resultData = jobStatus.result;
+                        break;
+                    }
+
+                    if (Date.now() - startTime > 300000) {
+                        throw new Error('Processing timeout (5 minutes)');
+                    }
+
+                    await sleep(attempt === 1 ? 30000 : 10000);
+                }
+
+                // Display result
+                displayResult(resultData.input_url, resultData.output_url);
+
+            } catch (err) {
+                console.error(err);
+                showError(`❌ Error: ${err.message}`);
+            } finally {
+                hideLoading();
+                enhanceBtn.disabled = false;
+            }
+        }
+
+        function displayResult(inputUrl, outputUrl) {
+            const originalVideo = document.getElementById('originalVideo');
+            const enhancedVideo = document.getElementById('enhancedVideo');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            originalVideo.src = inputUrl;
+            enhancedVideo.src = outputUrl;
+
+            downloadBtn.onclick = () => downloadFile(outputUrl, `hd-video-${Date.now()}.mp4`);
+
+            showResult();
+        }
+
         async function downloadFile(url, filename) {
             try {
                 const response = await fetch(url);
@@ -513,186 +840,28 @@
                 document.body.removeChild(a);
             } catch (err) {
                 console.error('Download error:', err);
-                // Fallback: buka di tab baru
                 window.open(url, '_blank');
             }
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const url = urlInput.value.trim();
-            
-            // Validasi URL
-            const urlPattern = /https?:\/\/(vt\.tiktok\.com|vm\.tiktok\.com|www\.tiktok\.com|tiktok\.com)\/\S+/;
-            if (!urlPattern.test(url)) {
-                showError('❌ URL TikTok tidak valid!');
-                return;
-            }
-
-            // Reset UI
-            hideError();
-            hideResult();
-            showLoading();
-            downloadBtn.disabled = true;
-
-            try {
-                // API URL asli
-                const apiUrl = `https://labs.shannzx.xyz/api/v1/tiktok?url=${encodeURIComponent(url)}`;
-                
-                // Gunakan CORS Proxy
-                const corsProxy = 'https://api.allorigins.win/get?url=';
-                const response = await fetch(corsProxy + encodeURIComponent(apiUrl));
-                
-                if (!response.ok) {
-                    throw new Error(`Request failed with status ${response.status}`);
-                }
-
-                const proxyData = await response.json();
-                
-                // Parse response dari proxy
-                let data;
-                try {
-                    data = JSON.parse(proxyData.contents);
-                } catch (parseError) {
-                    throw new Error('Failed to parse API response');
-                }
-
-                if (!data || !data.status || !data.result) {
-                    throw new Error('Gagal mengambil data TikTok. URL mungkin tidak valid atau video sudah dihapus.');
-                }
-
-                const { type, result: resultData } = data;
-
-                if (type === 'slide') {
-                    displaySlides(resultData);
-                } else if (type === 'video') {
-                    displayVideo(resultData);
-                } else {
-                    throw new Error(`Tipe konten tidak dikenali: ${type || 'unknown'}`);
-                }
-
-            } catch (err) {
-                console.error('TikTok Error:', err);
-                showError(`❌ Terjadi kesalahan: ${err.message || 'Unknown error'}`);
-            } finally {
-                hideLoading();
-                downloadBtn.disabled = false;
-            }
-        });
-
-        function displaySlides(data) {
-            const { title, slides, music, total_slides } = data;
-            
-            if (!slides || !Array.isArray(slides) || slides.length === 0) {
-                showError('❌ Tidak ada slide yang ditemukan.');
-                return;
-            }
-
-            let html = '<h3>✅ TikTok Slides</h3>';
-            html += `<div class="info-item"><strong>📝 Title:</strong> ${title || 'No title'}</div>`;
-            html += `<div class="info-item"><strong>🖼️ Total Slides:</strong> ${total_slides || slides.length}</div>`;
-            
-            if (music && music.title && music.author) {
-                html += `<div class="info-item"><strong>🎵 Music:</strong> ${music.title} - ${music.author}</div>`;
-            }
-
-            html += '<div class="media-grid">';
-            slides.forEach((slideUrl, index) => {
-                html += `
-                    <div class="media-item">
-                        <img src="${slideUrl}" alt="Slide ${index + 1}" loading="lazy">
-                    </div>
-                `;
-            });
-            html += '</div>';
-
-            html += '<div style="margin-top: 15px; text-align: center;">';
-            slides.forEach((slideUrl, index) => {
-                html += `<button class="download-btn" onclick="downloadFile('${slideUrl}', 'slide-${index + 1}.jpg')">📥 Slide ${index + 1}</button>`;
-            });
-            
-            if (music && music.url) {
-                html += `<button class="download-btn" onclick="downloadFile('${music.url}', 'audio.mp3')">🎵 Download Audio</button>`;
-            }
-            html += '</div>';
-
-            result.innerHTML = html;
-            showResult();
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
-        function displayVideo(data) {
-            const { title, video_hd, video_sd, music, stats, duration, thumbnail } = data;
-            
-            const videoUrl = video_hd || video_sd;
-            
-            if (!videoUrl) {
-                showError('❌ Video URL tidak ditemukan.');
-                return;
-            }
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }).replace(/-/g, '');
+        }
 
-            let html = '<h3>✅ TikTok Video</h3>';
-            
-            // Thumbnail preview
-            if (thumbnail) {
-                html += `
-                    <div style="margin: 15px 0;">
-                        <img src="${thumbnail}" alt="Video Thumbnail" style="width: 100%; border-radius: 8px; max-height: 300px; object-fit: cover;">
-                    </div>
-                `;
-            }
-            
-            html += `<div class="info-item"><strong>📝 Title:</strong> ${title || 'No title'}</div>`;
-            html += `<div class="info-item"><strong>⏱️ Duration:</strong> ${duration}s</div>`;
-            
-            if (stats) {
-                html += '<div class="stats">';
-                html += `
-                    <div class="stat-card">
-                        <div class="number">${stats.views?.toLocaleString('id-ID') || 0}</div>
-                        <div class="label">👀 Views</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number">${stats.likes?.toLocaleString('id-ID') || 0}</div>
-                        <div class="label">❤️ Likes</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number">${stats.comments?.toLocaleString('id-ID') || 0}</div>
-                        <div class="label">💬 Comments</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number">${stats.shares?.toLocaleString('id-ID') || 0}</div>
-                        <div class="label">🔄 Shares</div>
-                    </div>
-                `;
-                html += '</div>';
-            }
-            
-            if (music && music.title && music.author) {
-                html += `<div class="info-item"><strong>🎵 Music:</strong> ${music.title} - ${music.author}</div>`;
-            }
-
-            html += `
-                <video controls controlsList="nodownload" style="width: 100%; border-radius: 8px; margin: 15px 0; max-height: 500px;">
-                    <source src="${videoUrl}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            `;
-
-            html += '<div style="margin-top: 15px; text-align: center;">';
-            if (video_hd) {
-                html += `<button class="download-btn" onclick="downloadFile('${video_hd}', 'tiktok-hd.mp4')">📥 Download HD</button>`;
-            }
-            if (video_sd) {
-                html += `<button class="download-btn" onclick="downloadFile('${video_sd}', 'tiktok-sd.mp4')">📥 Download SD</button>`;
-            }
-            if (music && music.url) {
-                html += `<button class="download-btn" onclick="downloadFile('${music.url}', 'audio.mp3')">🎵 Download Audio</button>`;
-            }
-            html += '</div>';
-
-            result.innerHTML = html;
-            showResult();
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         function showLoading() {
