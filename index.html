@@ -316,31 +316,26 @@
             downloadBtn.disabled = true;
 
             try {
-                // Gunakan PHP backend untuk bypass CORS
-                // Jika menggunakan PHP backend (recommended)
-                const usePhpBackend = true; // Set false jika tidak pakai PHP
+                // API URL asli
+                const apiUrl = `https://labs.shannzx.xyz/api/v1/tiktok?url=${encodeURIComponent(url)}`;
                 
-                let apiUrl;
-                if (usePhpBackend) {
-                    // Menggunakan PHP backend (taruh api.php di folder yang sama)
-                    apiUrl = `api.php?url=${encodeURIComponent(url)}`;
-                } else {
-                    // Direct ke API (mungkin kena CORS)
-                    apiUrl = `https://labs.shannzx.xyz/api/v1/tiktok?url=${encodeURIComponent(url)}`;
-                }
-                
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    }
-                });
+                // Gunakan CORS Proxy
+                const corsProxy = 'https://api.allorigins.win/get?url=';
+                const response = await fetch(corsProxy + encodeURIComponent(apiUrl));
                 
                 if (!response.ok) {
-                    throw new Error(`API returned status ${response.status}`);
+                    throw new Error(`Request failed with status ${response.status}`);
                 }
 
-                const data = await response.json();
+                const proxyData = await response.json();
+                
+                // Parse response dari proxy
+                let data;
+                try {
+                    data = JSON.parse(proxyData.contents);
+                } catch (parseError) {
+                    throw new Error('Failed to parse API response');
+                }
 
                 if (!data || !data.status || !data.result) {
                     throw new Error('Gagal mengambil data TikTok. URL mungkin tidak valid atau video sudah dihapus.');
